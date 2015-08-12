@@ -5,6 +5,10 @@
 #include "OMX_Core.h"
 #include "omxtest_base_component.h"
 
+#define OT_INPUT_PORT_NAME      "ot.inputport"
+#define OT_OUTPUT_PORT_NAME     "ot.outputport"
+#define OT_MAX_PORT_NAME_LEN    128
+
 typedef enum _BufferStatus {
     BUFFER_IDLE =       0x00,
     BUFFER_PROCESSING = 0x01,
@@ -14,7 +18,9 @@ typedef enum _BufferStatus {
 typedef enum _PortStatus {
     PORT_IDLE =         0x00,
     PORT_PROCESSING =   0x01,
-    PORT_ERROR =        0x02
+    PORT_INVALID =      0x02,
+    PORT_ENABLE =       0x03,
+    PORT_DISABLE =      0x04
 } PortStatus;
 
 typedef enum _BufferProcessType {
@@ -41,7 +47,7 @@ typedef struct _Way1PortDataBuffer {
 } Way1PortDataBuffer;
 
 typedef struct _BasePort {
-    OMX_STRING          sport_name;
+    OMX_STRING          sport_name[OT_MAX_PORT_NAME_LEN];
     OMX_VERSIONTYPE     version;
     OMX_HANDLETYPE      pprivate;
     PortType            port_type;
@@ -51,7 +57,20 @@ typedef struct _BasePort {
 
 OMX_ERRORTYPE BaseportConstruct(OMX_HANDLETYPE pcomponent)
 { 
+    OMX_COMPONENTTYPE *pomx_component = (OMX_COMPONENTTYPE *)pcomponent;
+
+    BaseComponent *pbase_component = pomx_component->pComponentPrivate;
+    /* initialize input port */
+    BasePort *pinput_port = pbase_component->port[0];
+    strcpy(pintput_port->sport_name, OT_INPUT_PORT_NAME);
+    pinput_port->port1_data_buffer.buffer_process_type = PORT_INPUT;
+    pinput_port->port1_data_buffer.pdata_buffer_mutex = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(pinput_port->port1_data_buffer.pdata_buffer_mutex, NULL);
 }
+
 OMX_ERRORTYPE BaseportDeConstruct(OMX_HANDLETYPE pcomponent);
+OMX_ERRORTYPE BaseportEnable(OMX_HANDLETYPE pcomponent, OMX_S32 iport_index);
+OMX_ERRORTYPE BaseportDisable(OMX_HANDLETYPE pcomponent, OMX_S32 iport_index);
+
 
 #endif

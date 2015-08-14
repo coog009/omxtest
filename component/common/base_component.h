@@ -11,7 +11,7 @@ typedef struct _BaseComponent {
     OMX_HANDLETYPE  pprivate;
 } BaseComponent;
 
-OMX_ERRORTYPE omxtest_basecomponent_Constructor(OMX_IN OMX_HANDLETYPE hComponent)
+OMX_ERRORTYPE BaseComponentConstructor(OMX_IN OMX_HANDLETYPE hComponent)
 {
     OMX_ERRORTYPE             ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE        *pOMXComponent;
